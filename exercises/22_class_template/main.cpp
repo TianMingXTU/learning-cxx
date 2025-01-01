@@ -1,7 +1,5 @@
 ﻿#include "../exercise.h"
-#include <cmath>
 #include <cstring>
-#include <algorithm>
 
 // READ: 类模板 <https://zh.cppreference.com/w/cpp/language/class_template>
 
@@ -13,10 +11,9 @@ struct Tensor4D {
     Tensor4D(unsigned int const shape_[4], T const *data_) {
         unsigned int size = 1;
         // TODO: 填入正确的 shape 并计算 size
-        for (int i = 0; i < 4; ++i) {
-            shape[i] = shape_[i];
-            size *= shape_[i];
-        }
+        std::memcpy(shape, shape_, 4 * sizeof(unsigned int));
+        size = shape[0] * shape[1] * shape[2] * shape[3];
+
         data = new T[size];
         std::memcpy(data, data_, size * sizeof(T));
     }
@@ -35,28 +32,34 @@ struct Tensor4D {
     // 则 `this` 与 `others` 相加时，3 个形状为 `[1, 2, 1, 4]` 的子张量各自与 `others` 对应项相加。
     Tensor4D &operator+=(Tensor4D const &others) {
         // TODO: 实现单向广播的加法
-        for (int i = 0; i < 4; ++i) {
-            if (shape[i] != others.shape[i] && others.shape[i] != 1) {
-                throw std::invalid_argument("Incompatible shapes for broadcasting.");
+        int oi, oj, ok, ol;
+        for(int i = 0; i < shape[0]; i++){
+            if(others.shape[0] != shape[0]){
+                oi = 0;
+            }else{
+                oi = i;
             }
-        }
-
-        unsigned int strides[4];
-        unsigned int other_strides[4];
-        strides[3] = 1;
-        other_strides[3] = 1;
-        for (int i = 2; i >= 0; --i) {
-            strides[i] = strides[i + 1] * shape[i + 1];
-            other_strides[i] = other_strides[i + 1] * others.shape[i + 1];
-        }
-
-        for (unsigned int i0 = 0; i0 < shape[0]; ++i0) {
-            for (unsigned int i1 = 0; i1 < shape[1]; ++i1) {
-                for (unsigned int i2 = 0; i2 < shape[2]; ++i2) {
-                    for (unsigned int i3 = 0; i3 < shape[3]; ++i3) {
-                        unsigned int index = i0 * strides[0] + i1 * strides[1] + i2 * strides[2] + i3 * strides[3];
-                        unsigned int other_index = i0 * other_strides[0] + i1 * other_strides[1] + i2 * other_strides[2] + i3 * other_strides[3];
-                        data[index] += others.data[other_index];
+            for(int j = 0; j < shape[1]; j++){
+                if(others.shape[1] != shape[1]){
+                    oj = 0;
+                }else{
+                    oj = j;
+                }
+                for(int k = 0; k < shape[2]; k++){
+                    if(others.shape[2] != shape[2]){
+                        ok = 0;
+                    }else{
+                        ok = k;
+                    }
+                    for(int l = 0; l < shape[3]; l++){
+                        if(others.shape[3] != shape[3]){
+                            ol = 0;
+                        }else{
+                            ol = l;
+                        }
+                        auto index = i * shape[1] * shape[2] * shape[3] + j * shape[2] * shape[3] + k * shape[3] + l;
+                        auto oindex = oi * others.shape[1] * others.shape[2] * others.shape[3] + oj * others.shape[2] * others.shape[3] + ok * others.shape[3] + ol;
+                        data[index] += others.data[oindex];
                     }
                 }
             }

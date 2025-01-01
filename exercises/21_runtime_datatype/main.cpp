@@ -27,8 +27,8 @@ TaggedUnion sigmoid_dyn(TaggedUnion x) {
     TaggedUnion ans{x.type};
     // TODO: 根据 type 调用 sigmoid
     if (x.type == DataType::Float) {
-        ans.f = sigmoid(x.f);
-    } else if (x.type == DataType::Double) {
+        ans.f = sigmoid<float>(x.f);
+    } else {
         ans.d = sigmoid(x.d);
     }
     return ans;

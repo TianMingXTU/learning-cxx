@@ -10,14 +10,14 @@ unsigned long long fibonacci(int i) {
         case 1:
             return 1;
         default:
-            // 补全三目表达式缺失的部分
+            // TODO: 补全三目表达式缺失的部分
             return arr[i] != 0 ? arr[i] : (arr[i] = fibonacci(i - 1) + fibonacci(i - 2));
     }
 }
 
 int main(int argc, char **argv) {
-    // 填写正确的值
-    ASSERT(sizeof(arr) == 90 * sizeof(unsigned long long), "sizeof array is size of all its elements");
+    // TODO: 为此 ASSERT 填写正确的值
+    ASSERT(sizeof(arr) == 90 * 8, "sizeof array is size of all its elements");
     // ---- 不要修改以下代码 ----
     ASSERT(fibonacci(2) == 1, "fibonacci(2) should be 1");
     ASSERT(fibonacci(20) == 6765, "fibonacci(20) should be 6765");

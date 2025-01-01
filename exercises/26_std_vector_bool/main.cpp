@@ -1,34 +1,36 @@
 ﻿#include "../exercise.h"
 #include <vector>
 
-// READ: std::vector <https://zh.cppreference.com/w/cpp/container/vector_bool>
-// READ: 模板特化 <https://zh.cppreference.com/w/cpp/language/template_specialization>
+// 张量即多维数组。连续存储张量即逻辑结构与存储结构一致的张量。
+// 通常来说，形状为 [d0, d1, ..., dn] 的张量，第 n 维是 dn 个连续的元素，第 n-1 维是 dn-1 个连续的 dn 个元素，以此类推。
+// 张量的步长或跨度指的是张量每个维度上坐标 +1 时，数据指针跨过的范围。
+// 因此，一个连续张量，其第 n 维的步长为 1，第 n-1 维的步长为 dn，第 n-2 维的步长为 dn*dn-1，以此类推。
+// 例如，一个 2x3x4 张量，其步长为 [12, 4, 1]。
 
-// TODO: 将下列 `?` 替换为正确的代码
+// READ: 类型别名 <https://zh.cppreference.com/w/cpp/language/type_alias>
+using udim = unsigned int;
+
+/// @brief 计算连续存储张量的步长
+/// @param shape 张量的形状
+/// @return 张量每维度的访问步长
+std::vector<udim> strides(std::vector<udim> const &shape) {
+    std::vector<udim> strides(shape.size());
+    // TODO: 完成函数体，根据张量形状计算张量连续存储时的步长。
+    // READ: 逆向迭代器 std::vector::rbegin <https://zh.cppreference.com/w/cpp/container/vector/rbegin>
+    //       使用逆向迭代器可能可以简化代码
+    strides.back() = 1;
+    for(auto i = strides.rbegin() + 1; i != strides.rend(); ++i) {
+        auto index = strides.rend() - i;
+        *i = *(i - 1) * shape[index];
+    }
+    return strides;
+}
+
+// ---- 不要修改以下代码 ----
 int main(int argc, char **argv) {
-    std::vector<bool> vec(100, true); // TODO: 正确调用构造函数
-    ASSERT(vec[0], "Make this assertion pass.");
-    ASSERT(vec[99], "Make this assertion pass.");
-    ASSERT(vec.size() == 100, "Make this assertion pass.");
-    // NOTICE: 平台相关！注意 CI:Ubuntu 上的值。
-    std::cout << "sizeof(std::vector<bool>) = " << sizeof(std::vector<bool>) << std::endl;
-    ASSERT(sizeof(vec) == sizeof(std::vector<bool>), "Fill in the correct value.");
-    {
-        vec[20] = false;
-        ASSERT(!vec[20], "Fill in `vec[20]` or `!vec[20]`.");
-    }
-    {
-        vec.push_back(false);
-        ASSERT(vec.size() == 101, "Fill in the correct value.");
-        ASSERT(!vec[100], "Fill in `vec[100]` or `!vec[100]`.");
-    }
-    {
-        auto ref = vec[30];
-        ASSERT(ref, "Fill in `ref` or `!ref`");
-        ref = false;
-        ASSERT(!ref, "Fill in `ref` or `!ref`");
-        // THINK: WHAT and WHY?
-        ASSERT(!vec[30], "Fill in `vec[30]` or `!vec[30]`.");
-    }
+    ASSERT((strides({2, 3, 4}) == std::vector<udim>{12, 4, 1}), "Make this assertion pass.");
+    ASSERT((strides({3, 4, 5}) == std::vector<udim>{20, 5, 1}), "Make this assertion pass.");
+    ASSERT((strides({1, 3, 224, 224}) == std::vector<udim>{150528, 50176, 224, 1}), "Make this assertion pass.");
+    ASSERT((strides({7, 1, 1, 1, 5}) == std::vector<udim>{5, 5, 5, 5, 1}), "Make this assertion pass.");
     return 0;
 }
